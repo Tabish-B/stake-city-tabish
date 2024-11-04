@@ -85,3 +85,9 @@ body {
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
+
+.featured-section {
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+}
