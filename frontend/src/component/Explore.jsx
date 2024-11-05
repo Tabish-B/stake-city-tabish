@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import MapBoxMap from './explore/MapboxMap'
 import DropTaskPopup from "./explore/droptask";
-import ControlOverlay from './controlOverlay';
 
 const isDevelopment = true; 
 
@@ -30,8 +29,6 @@ const Explore = () => {
             showControls={false}
             q_id={q_id}
             />
-
-            <ControlOverlay /> 
         </div>
     );
 };
