@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { getFresnelMat } from '../helpers/getFresnelMat'; // Assuming this file is still located here
+import { getFresnelMat } from '../helpers/getFresnelMat';
 import '../component/styles/globe.css';
 
 const Globe = () => {
@@ -10,20 +10,23 @@ const Globe = () => {
   let frameId; // For canceling the animation frame
 
   useEffect(() => {
-    // Get the container for the globe
     const container = globeRef.current;
     const width = container.offsetWidth;
     const height = container.offsetHeight;
 
-    // Function to adjust the camera and globe size based on screen width
-    const adjustGlobeSize = (camera) => {
+    // Function to adjust the camera and globe position based on screen width
+    const adjustGlobeSize = (camera, earthGroup) => {
       const screenWidth = window.innerWidth;
 
-      // Set camera position and globe scale based on screen width
-      if (screenWidth < 768) { // Small screen (mobile)
-        camera.position.z = 3.8; // Zoom out a bit more for mobile
-      } else { // Larger screens (tablet, desktop)
-        camera.position.z = 2; // Keep original camera position for larger screens
+      if (screenWidth < 640) { // Mobile screens
+        camera.position.z = 4; // Zoom out further for smaller screens
+        earthGroup.position.y = 1.2; // Move the globe up slightly on mobile
+      } else if (screenWidth < 1024) { // Tablet screens
+        camera.position.z = 3; // Moderate zoom
+        earthGroup.position.y = 0.7; // Slightly up for tablet
+      } else { // Desktop screens
+        camera.position.z = 2; // Standard position
+        earthGroup.position.y = 0; // Centered for desktop
       }
     };
 
@@ -35,7 +38,6 @@ const Globe = () => {
 
     // Set up the camera
     const camera = new THREE.PerspectiveCamera(65, width / height, 0.1, 1000);
-    adjustGlobeSize(camera); // Adjust globe size on mount based on screen size
 
     // Set up the scene
     const scene = new THREE.Scene();
@@ -45,9 +47,8 @@ const Globe = () => {
     earthGroup.rotation.z = -23.4 * Math.PI / 180;
     scene.add(earthGroup);
 
-    const detail = 6; // Reduced detail level for performance
     const loader = new THREE.TextureLoader();
-    const geo = new THREE.IcosahedronGeometry(1.0, detail);
+    const geo = new THREE.IcosahedronGeometry(1.0, 6);
 
     // Earth material
     const mat = new THREE.MeshStandardMaterial({
@@ -88,6 +89,30 @@ const Globe = () => {
     sunLight.position.set(-2, 0.5, 1.5);
     scene.add(sunLight);
 
+    // Initial globe size adjustment
+    adjustGlobeSize(camera, earthGroup);
+
+    // Animation loop
+    const animate = () => {
+      frameId = requestAnimationFrame(animate);
+
+      earthMesh.rotation.y += 0.0001;
+      lightsMesh.rotation.y += 0.0001;
+      cloudsMesh.rotation.y += 0.00015; // Reduce cloud rotation slightly for better performance
+      glowMesh.rotation.y += 0.0001;
+
+      renderer.render(scene, camera);
+    };
+    animate();
+
+    // Handle resizing to keep globe and camera responsive
+    const handleResize = () => {
+      renderer.setSize(container.offsetWidth, container.offsetHeight);
+      camera.aspect = container.offsetWidth / container.offsetHeight;
+      camera.updateProjectionMatrix();
+      adjustGlobeSize(camera, earthGroup); // Reapply size adjustments on resize
+    };
+
     // Throttle scroll handling
     let scrollTimeout;
     const handleScroll = () => {
@@ -107,29 +132,6 @@ const Globe = () => {
 
         scrollTimeout = null;
       }, 100); // Throttle scroll event by 100ms
-    };
-
-    // Animation loop
-    const animate = () => {
-      frameId = requestAnimationFrame(animate);
-
-      earthMesh.rotation.y += 0.0001;
-      lightsMesh.rotation.y += 0.0001;
-      cloudsMesh.rotation.y += 0.00015; // Reduce cloud rotation slightly for better performance
-      glowMesh.rotation.y += 0.0001;
-
-      renderer.render(scene, camera);
-    };
-    animate();
-
-    // Handle resizing
-    const handleResize = () => {
-      const newWidth = container.offsetWidth;
-      const newHeight = container.offsetHeight;
-      renderer.setSize(newWidth, newHeight);
-      camera.aspect = newWidth / newHeight;
-      adjustGlobeSize(camera); // Adjust globe size on resize
-      camera.updateProjectionMatrix();
     };
 
     window.addEventListener('resize', handleResize);

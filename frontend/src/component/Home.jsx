@@ -47,16 +47,22 @@ const Home = () => {
 
     return (
         <>
-            <Header />
-            <div className="glob_area relative flex justify-center items-center h-screen  mt-10 sm:mt-20">
+                <Header />
+
+            <div className="glob_area relative flex justify-center items-center h-screen">
                 <Globe />
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                    <h1 className="drop-shadow-xl text-3xl sm:text-5xl text-white">Are you ready to explore?</h1>
+
+                {/* Responsive positioning for the text and button */}
+                <div className="absolute inset-y-[35%] sm:inset-y-[35%] md:inset-y-[35%] lg:inset-y-[48%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                    {/* Adjust text size for smaller screens */}
+                    <h1 className="drop-shadow-xl text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white whitespace-nowrap">
+                        Are you ready to explore?
+                    </h1>
                     <Tilt tiltMaxAngleX={20} tiltMaxAngleY={20} scale={1.1} transitionSpeed={250}>
                         <Link
                             onClick={handleStart}
-                            className="start-game-btn rounded-3xl px-20 py-3 mt-4 bg-emerald-400 shadow-lg shadow-emerald-800 hover:bg-emerald-300 hover:text-grey hover:shadow-sm hover:shadow-emerald-500 transition-shadow transition-2 ease-in-out inline-block"
-                            style={{ minWidth: '140px' }}
+                            className="rounded-3xl px-12 sm:px-16 md:px-20 py-3 mt-4 bg-emerald-400 shadow-lg shadow-emerald-800 hover:bg-emerald-300 hover:text-grey hover:shadow-sm hover:shadow-emerald-500 transition-shadow duration-200 ease-in-out inline-block"
+                            style={{ minWidth: '120px' }}
                         >
                             Start Game
                         </Link>
